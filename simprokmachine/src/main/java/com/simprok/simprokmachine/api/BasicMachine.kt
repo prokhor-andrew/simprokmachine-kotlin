@@ -18,13 +18,13 @@ import kotlinx.coroutines.Dispatchers.IO
  */
 class BasicMachine<Input, Output>(
     override val dispatcher: CoroutineDispatcher = IO,
-    private val processor: SuspendBiHandler<Input?, Handler<Output>>
+    private val processor: BiHandler<Input?, Handler<Output>>
 ) : ChildMachine<Input, Output> {
 
     /**
      * `ChildMachine` interface method
      */
-    override suspend fun process(input: Input?, callback: Handler<Output>) {
+    override fun process(input: Input?, callback: Handler<Output>) {
         processor(input, callback)
     }
 }

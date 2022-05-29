@@ -26,5 +26,5 @@ interface ChildMachine<Input, Output> : Machine<Input, Output> {
     * @param input - a received input. `null` if triggered after subscription.
     * @param callback - a callback used for emitting output.
      */
-    suspend fun process(input: Input?, callback: Handler<Output>)
+    fun process(input: Input?, callback: Handler<Output>)
 }

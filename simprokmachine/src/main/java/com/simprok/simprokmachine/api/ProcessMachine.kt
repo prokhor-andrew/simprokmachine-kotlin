@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
  * behavior over the injected object. Exists for convenience.
  */
 class ProcessMachine<Input, Output> private constructor(
-    private val processor: suspend (Input?, Handler<Output>) -> Unit
+    private val processor: BiHandler<Input?, Handler<Output>>
 ) : ChildMachine<Input, Output> {
 
     companion object {
@@ -29,7 +29,7 @@ class ProcessMachine<Input, Output> private constructor(
          */
         fun <O, Input, Output> create(
             _object: O,
-            processor: suspend (O, Input?, Handler<Output>) -> Unit
+            processor: TriHandler<O, Input?, Handler<Output>>
         ) = ProcessMachine<Input, Output> { input, callback ->
             processor(_object, input, callback)
         }
@@ -44,7 +44,7 @@ class ProcessMachine<Input, Output> private constructor(
     /**
      * `ChildMachine` interface method
      */
-    override suspend fun process(input: Input?, callback: Handler<Output>) {
+    override fun process(input: Input?, callback: Handler<Output>) {
         processor(input, callback)
     }
 }

@@ -10,9 +10,10 @@ package com.simprok.simprokmachine.api
 typealias Handler<T> = (T) -> Unit
 typealias Mapper<I, R> = (I) -> R
 
-typealias BiMapper<T1, T2, R> = (T1, T2) -> R
 typealias BiHandler<T1, T2> = (T1, T2) -> Unit
+typealias BiMapper<I1, I2, R> = (I1, I2) -> R
 
-typealias SuspendBiHandler<T1, T2> = suspend (T1, T2) -> Unit
+typealias TriHandler<T1, T2, T3> = (T1, T2, T3) -> Unit
+typealias TriMapper<I1, I2, I3, R> = (I1, I2, I3) -> R
 
 typealias  Supplier<T> = () -> T

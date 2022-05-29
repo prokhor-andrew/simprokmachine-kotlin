@@ -20,7 +20,7 @@ internal class EmitterMachine<Input, Output>(
     override val dispatcher: CoroutineDispatcher
         get() = IO
 
-    override suspend fun process(
+    override fun process(
         input: EmitterInput<Input>?,
         callback: Handler<EmitterOutput<Input, Output>>
     ) {

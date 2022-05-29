@@ -41,7 +41,7 @@ class ConnectableMachine<Input, Output, C : Connection<Input, Output>>(
     /**
      * `ChildMachine` interface method
      */
-    override suspend fun process(input: Input?, callback: Handler<Output>) {
+    override fun process(input: Input?, callback: Handler<Output>) {
         if (input != null) {
             when (val result = reducer(state, input)) {
                 is ConnectionType.Reduce<Input, Output, C> -> {
