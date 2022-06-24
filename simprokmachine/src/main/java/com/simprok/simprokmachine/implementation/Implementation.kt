@@ -9,10 +9,8 @@ package com.simprok.simprokmachine.implementation
 
 import com.simprok.simprokmachine.api.Handler
 import com.simprok.simprokmachine.machines.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 
 internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope): Pair<Flow<Output>, Handler<Input>> {
@@ -56,7 +54,7 @@ internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope):
             return machine.supplier(scope)
         }
         is RedirectMachine<Input, Output> -> {
-            return machine.supplier(scope);
+            return machine.supplier(scope)
         }
     }
 }
@@ -65,8 +63,6 @@ internal fun <Input, Output> execute(
     scope: CoroutineScope,
     child: Machine<Input, Output>,
     callback: Handler<Output>
-) {
-    scope.launch(Dispatchers.IO) {
-        child.pair(this).first.collect(callback)
-    }
+): Job = scope.launch(Dispatchers.IO) {
+    child.pair(this).first.collect(callback)
 }
