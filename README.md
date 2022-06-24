@@ -31,7 +31,7 @@ class PrinterMachine : ChildMachine<String, Unit> {
     override val dispatcher: CoroutineDispatcher
         get() = Dispatchers.Main
 
-    override suspend fun process(input: String?, callback: Handler<Unit>) {
+    override fun process(input: String?, callback: Handler<Unit>) {
         println(input)
     }
 }
@@ -67,7 +67,7 @@ class EmittingMachine : ChildMachine<String, Unit> {
     override val dispatcher: CoroutineDispatcher
         get() = Dispatchers.Main
 
-    override suspend fun process(input: String?, callback: Handler<Unit>) {
+    override fun process(input: String?, callback: Handler<Unit>) {
         if (input != null) {
             println("input: \(input)")
         } else {
@@ -77,23 +77,6 @@ class EmittingMachine : ChildMachine<String, Unit> {
 }
 ```
 
-Standard implementations of ```ChildMachine``` are ```BasicMachine``` and ```ProcessMachine```.
-
-```Kotlin
-... = BasicMachine<Int, Unit> { input, callback ->
-    // handle input here
-    // emit output if needed
-}
-```
-
-and
-
-```Kotlin
-... = ProcessMachine<Int, Unit>(this) { thisObject, input, callback ->
-    // handle input here
-    // emit output if needed
-}
-```
 
 To separate machines into classes instead of cluttering them up in the root, use ```ParentMachine``` interface.
 
@@ -145,19 +128,6 @@ Machine.merge(
 )
 ```
 
-To dynamically create and connect machines when new input received - use ```ConnectableMachine```.
-
-```Kotlin
-... = ConnectableMachine<Int, Unit>(
-    BasicConnection<Int, Unit>(MyMachine1(), MyMachine2())
-) { state, input ->
-    // Return
-    // ConnectionType.Reduce(BasicConnection<Int, Unit>) - when new machines have to be connected.
-    // ConnectionType.Inward() - when existing machines have to receive input: Int
-    ...
-}
-```
-
 Check out the [wiki](https://github.com/simprok-dev/simprokmachine-kotlin/wiki) for more information about API and how to use it.
 
 
@@ -175,7 +145,7 @@ Check out the [wiki](https://github.com/simprok-dev/simprokmachine-kotlin/wiki) 
 Add this in your project's gradle file:
 
 ```groovy
-implementation 'com.github.simprok-dev:simprokmachine-kotlin:1.1.3'
+implementation 'com.github.simprok-dev:simprokmachine-kotlin:1.1.4'
 ```
 
 and this in your settings.gradle file:
