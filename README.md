@@ -43,9 +43,6 @@ To start the flow use ```RootMachine``` interface in your top-level class.
 class MyViewModel: RootMachine<String, Unit> {
     override val machine: Machine<String, Unit>
         get() = PrinterMachine()
-
-    override val scope: CoroutineScope
-        get() = viewModelScope
 }
 ```
 
@@ -53,7 +50,9 @@ and don't forget to call ```start()``` to trigger the flow.
 
 ```Kotlin
 init {
-    start()
+    start(viewModelScope) { output -> 
+    
+    }
 }
 ```
 
@@ -145,7 +144,7 @@ Check out the [wiki](https://github.com/simprok-dev/simprokmachine-kotlin/wiki) 
 Add this in your project's gradle file:
 
 ```groovy
-implementation 'com.github.simprok-dev:simprokmachine-kotlin:1.1.4'
+implementation 'com.github.simprok-dev:simprokmachine-kotlin:1.1.5'
 ```
 
 and this in your settings.gradle file:
