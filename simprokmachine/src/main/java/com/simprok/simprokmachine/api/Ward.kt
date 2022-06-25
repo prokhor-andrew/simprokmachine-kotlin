@@ -27,5 +27,12 @@ class Ward<T> private constructor(val values: List<T>) {
          * @param values - sent values.
          */
         fun <T> set(values: List<T>): Ward<T> = Ward(values)
+
+        /**
+         * Creates a `Ward` object with specified `values` that are sent either to the child or
+         * to the root depending on the used operator.
+         * @param values - sent values.
+         */
+        fun <T> setArray(values: Array<T>): Ward<T> = Ward(values.toList())
     }
 }

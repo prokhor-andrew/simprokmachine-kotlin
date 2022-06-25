@@ -16,9 +16,14 @@ sealed interface Direction<Input> {
      * Returning this value from `Machine.redirect()`
      * method ensures that `[Input]` will be sent back to the child.
      */
-    class Back<Input>(vararg values: Input) : Direction<Input> {
+    class Back<Input>(val values: List<Input>) : Direction<Input> {
 
-        val values: List<Input> = values.toList()
+        constructor(vararg values: Input) : this(values.toList())
+
+        companion object {
+
+            fun <Input> createArray(values: Array<Input>): Back<Input> = Back(values.toList())
+        }
     }
 
     /**
