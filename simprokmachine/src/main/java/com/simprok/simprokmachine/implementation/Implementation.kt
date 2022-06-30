@@ -23,13 +23,14 @@ internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope):
                 flow2,
                 flow1.onStart { emit(null) }
                     .onEach {
-                        machine.process(it) {
-                            scope.launch(Dispatchers.IO) {
-                                flow2.emit(it)
+                        withContext(machine.dispatcher) {
+                            machine.process(it) {
+                                scope.launch(Dispatchers.IO) {
+                                    flow2.emit(it)
+                                }
                             }
                         }
                     }
-                    .flowOn(machine.dispatcher)
                     .map<Input?, Output?> { null }
                     .filter { it != null }
                     .map { it!! }
@@ -62,7 +63,7 @@ internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope):
 internal fun <Input, Output> execute(
     scope: CoroutineScope,
     child: Machine<Input, Output>,
-    callback: Handler<Output>
+    callback: Handler<Output>,
 ): Job = scope.launch(Dispatchers.IO) {
     child.pair(this).first.collect(callback)
 }
