@@ -144,7 +144,7 @@ Check out the [wiki](https://github.com/simprok-dev/simprokmachine-kotlin/wiki) 
 Add this in your project's gradle file:
 
 ```groovy
-implementation 'com.github.simprok-dev:simprokmachine-kotlin:1.1.7'
+implementation 'com.github.simprok-dev:simprokmachine-kotlin:1.1.6'
 ```
 
 and this in your settings.gradle file:
