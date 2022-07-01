@@ -8,12 +8,17 @@
 package com.simprok.simprokmachine.implementation
 
 import com.simprok.simprokmachine.api.Handler
+import com.simprok.simprokmachine.api.MachineException
+import com.simprok.simprokmachine.api.RootCallback
 import com.simprok.simprokmachine.machines.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 
-internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope): Pair<Flow<Output>, Handler<Input>> {
+internal fun <Input, Output> Machine<Input, Output>.pair(
+    scope: CoroutineScope,
+    onError: Handler<MachineException>,
+): Pair<Flow<Output>, Handler<Input>> {
     when (val machine = this) {
         is ChildMachine<Input, Output> -> {
             val flow1 = MutableSharedFlow<Input?>(replay = 1)
@@ -23,12 +28,16 @@ internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope):
                 flow2,
                 flow1.onStart { emit(null) }
                     .onEach {
-                        withContext(machine.dispatcher) {
-                            machine.process(it) {
-                                scope.launch(Dispatchers.IO) {
-                                    flow2.emit(it)
+                        try {
+                            withContext(machine.dispatcher) {
+                                machine.process(it) {
+                                    scope.launch(Dispatchers.IO) {
+                                        flow2.emit(it)
+                                    }
                                 }
                             }
+                        } catch (error: Throwable) {
+                            onError(MachineException.ProcessingException(error))
                         }
                     }
                     .map<Input?, Output?> { null }
@@ -42,18 +51,22 @@ internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope):
                 }
             }
         }
-        is ParentMachine<Input, Output> -> return machine.child.pair(scope)
-        is MergeMachine<Input, Output> -> return machine.supplier(scope)
-        is InwardMachine<Input, Output> -> return machine.supplier(scope)
-        is OutwardMachine<Input, Output> -> return machine.supplier(scope)
-        is RedirectMachine<Input, Output> -> return machine.supplier(scope)
+        is ParentMachine<Input, Output> -> return machine.child.pair(scope, onError)
+        is MergeMachine<Input, Output> -> return machine.supplier(scope, onError)
+        is InwardMachine<Input, Output> -> return machine.supplier(scope, onError)
+        is OutwardMachine<Input, Output> -> return machine.supplier(scope, onError)
+        is RedirectMachine<Input, Output> -> return machine.supplier(scope, onError)
     }
 }
 
 internal fun <Input, Output> execute(
     scope: CoroutineScope,
     child: Machine<Input, Output>,
-    callback: Handler<Output>,
+    callback: RootCallback<Output>,
 ): Job = scope.launch(Dispatchers.IO) {
-    child.pair(this).first.collect(callback)
+    try {
+        child.pair(this, callback::onError).first.collect(callback::onOutput)
+    } catch (error: Throwable) {
+        callback.onError(MachineException.SubscriptionException(error))
+    }
 }

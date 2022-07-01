@@ -7,15 +7,13 @@
 
 package com.simprok.simprokmachine.machines
 
-import com.simprok.simprokmachine.api.Handler
-import com.simprok.simprokmachine.api.Mapper
-import com.simprok.simprokmachine.api.Ward
+import com.simprok.simprokmachine.api.*
 import com.simprok.simprokmachine.implementation.pair
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 internal class InwardMachine<Input, Output>(
-    internal val supplier: Mapper<CoroutineScope, Pair<Flow<Output>, Handler<Input>>>
+    internal val supplier: BiMapper<CoroutineScope, Handler<MachineException>, Pair<Flow<Output>, Handler<Input>>>,
 ) : Machine<Input, Output> {
 
     companion object {
@@ -23,14 +21,18 @@ internal class InwardMachine<Input, Output>(
             child: Machine<ChildInput, Output>,
             mapper: Mapper<ParentInput, Ward<ChildInput>>,
         ): Machine<ParentInput, Output> {
-            return InwardMachine { scope ->
-                val pair = child.pair(scope)
+            return InwardMachine { scope, onError ->
+                val pair = child.pair(scope, onError)
                 val flow = pair.first
                 val setter = pair.second
 
                 Pair(flow) { parentInput ->
-                    mapper(parentInput).values.forEach {
-                        setter(it)
+                    try {
+                        mapper(parentInput).values.forEach {
+                            setter(it)
+                        }
+                    } catch (error: Throwable) {
+                        onError(MachineException.InwardException(error))
                     }
                 }
             }
