@@ -42,21 +42,11 @@ internal fun <Input, Output> Machine<Input, Output>.pair(scope: CoroutineScope):
                 }
             }
         }
-        is ParentMachine<Input, Output> -> {
-            return machine.child.pair(scope)
-        }
-        is MergeMachine<Input, Output> -> {
-            return machine.supplier(scope)
-        }
-        is InwardMachine<Input, Output> -> {
-            return machine.supplier(scope)
-        }
-        is OutwardMachine<Input, Output> -> {
-            return machine.supplier(scope)
-        }
-        is RedirectMachine<Input, Output> -> {
-            return machine.supplier(scope)
-        }
+        is ParentMachine<Input, Output> -> return machine.child.pair(scope)
+        is MergeMachine<Input, Output> -> return machine.supplier(scope)
+        is InwardMachine<Input, Output> -> return machine.supplier(scope)
+        is OutwardMachine<Input, Output> -> return machine.supplier(scope)
+        is RedirectMachine<Input, Output> -> return machine.supplier(scope)
     }
 }
 

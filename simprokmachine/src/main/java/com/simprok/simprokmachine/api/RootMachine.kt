@@ -36,7 +36,7 @@ interface RootMachine<Input, Output> {
  */
 fun <Input, Output> RootMachine<Input, Output>.start(
     scope: CoroutineScope,
-    callback: Handler<Output>
+    callback: Handler<Output> = {}
 ): Job =
     execute(scope, child, callback)
 
@@ -47,7 +47,7 @@ fun <Input, Output> RootMachine<Input, Output>.start(
  * Prefer using child machine that receives input and handles it.
  */
 suspend fun <Input, Output> RootMachine<Input, Output>.start(
-    callback: Handler<Output>
+    callback: Handler<Output> = {}
 ) = coroutineScope {
     execute(this, child, callback)
 }
